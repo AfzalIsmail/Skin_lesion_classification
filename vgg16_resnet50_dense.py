@@ -14,8 +14,8 @@ import tensorflow as tf
 trdata = ImageDataGenerator(rescale=None, validation_split=0.2,
                             shear_range=0.2, zoom_range=0.2,
                             horizontal_flip=True, rotation_range=70)
-traindata1 = trdata.flow_from_directory(directory="C:/Users/mai29/Documents/dataset/balanced_oneAugmented", target_size=(224,224), subset='training', class_mode='binary')#path to dataset
-testdata1 = trdata.flow_from_directory(directory="C:/Users/mai29/Documents/dataset/balanced_oneAugmented", target_size=(224,224), subset='validation', class_mode='binary')
+traindata1 = trdata.flow_from_directory(directory="C:/Users/mai29/Documents/dataset/balanced_oneAugmented", target_size=(224,224), subset='training')#path to dataset
+testdata1 = trdata.flow_from_directory(directory="C:/Users/mai29/Documents/dataset/balanced_oneAugmented", target_size=(224,224), subset='validation')
 
 #####Input layer
 input_shape = Input(shape=(224, 224, 3))
@@ -72,13 +72,13 @@ merged = Flatten()(merged)
 #####out layer
 out = Dense(512, activation='relu')(merged)
 out = Dropout(0.3)(out)
-out = Dense(1, activation='softmax')(out)
+out = Dense(2, activation='softmax')(out)
 
 #defining whole model
 model = Model(input_shape, out)
 
 #compiling model
-model.compile(optimizer=tf.keras.optimizers.SGD(lr=0.01), loss='binary_crossentropy', metrics=['acc', 'Precision', 'Recall', 'TruePositives', 'TrueNegatives', 'FalsePositives', 'FalseNegatives'])
+model.compile(optimizer=tf.keras.optimizers.SGD(lr=0.01), loss='categorical_crossentropy', metrics=['acc', 'Precision', 'Recall'])
 
 model.summary()
 
@@ -88,9 +88,12 @@ val_acc = history.history['val_acc']
 acc = history.history['acc']
 epochs = range(len(val_acc))
 
-plt.plot(epochs, acc, 'b')
-plt.plot(epochs, val_acc, 'r')
-plt.ylim(0,1)
+accl, = plt.plot(epochs, acc, 'b')
+val_accl, = plt.plot(epochs, val_acc, 'r')
+plt.title("Training and validation Accuracy")
+plt.legend([accl, val_accl], ['Training Accuracy', 'Validation Accuracy'])
+plt.xlabel('Epochs')
+#plt.ylim(0, 1)
 plt.show()
 
 #confusion matrix
